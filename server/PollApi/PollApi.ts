@@ -9,10 +9,11 @@ export default class PollApi {
   private defaultInterval: number = 5000;
   private callback;
 
-  constructor(callback: (update: CacheElement) => void) {
+  constructor(callback: (update: CacheElement[]) => void) {
     this.callback = callback;
   }
-  update(url: string, res: { data?: Object; errorMessage?: string }) {
+
+  updateCache(url: string, res: { data?: Object; errorMessage?: string }) {
     const currentData = this.cache.get(url);
     let newData = {
       data: {},
@@ -20,14 +21,21 @@ export default class PollApi {
       errorMessage: "",
     };
     newData = {
-      ...newData, // Applying default values
-      ...(currentData ? currentData : {}), // Overwriting default values with cached if available
-      ...(res ? res : {}), // Overwriting defaults and cache with new values if available
+      ...newData,
+      // Applying default values
+      ...(currentData ? currentData : {}),
+      // Overwriting default values with cached if available
+      ...(res ? res : {}),
+      // Overwriting defaults and cache with new values if available
     };
     this.cache.set(url, newData);
-    this.callback(newData);
+    const currentCache = Array.from(this.cache, ([url, value]) => [
+      { url, ...value },
+    ]);
+    this.callback(currentCache);
   }
-  add(url: string, interval: number = this.defaultInterval) {
+
+  addUrl(url: string, interval: number = this.defaultInterval) {
     if (!url) {
       console.error("No url to poll");
       return;
@@ -40,15 +48,22 @@ export default class PollApi {
       try {
         const res = await fetch(url);
         const data = await res.json();
-        this.update(url, { data });
+        // The response is always unique
+        // so we always update the cache
+        this.updateCache(url, { data });
       } catch (e) {
         console.error(
           `Error fetching url: ${url}.\nError message: ${e.message}`
         );
-        this.update(url, { errorMessage: e.message });
+        this.updateCache(url, { errorMessage: e.message });
       }
     };
     poll();
-    setInterval(poll, interval); // Cam't delete the timer for now
+    // Each request polls independently,
+    // regarding the state of others.
+    // Each request has it's own update interval
+    // in case of different frequency of updates.
+    // TODO: delete interval and cache entry
+    setInterval(poll, interval);
   }
 }

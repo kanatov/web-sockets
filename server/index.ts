@@ -1,4 +1,5 @@
-import PollApi, { type CacheElement } from "./PollApi/PollApi.ts";
+import PollApi from "./PollApi/PollApi.ts";
+import WebSocketsServer from "./WebSocketsServer/WebSocketsServer.ts";
 
 const API_LIST = [
   "https://data--us-east.upscope.io/status?stats=1",
@@ -8,15 +9,14 @@ const API_LIST = [
   "https://data--sa-east.upscope.io/status?stats=1",
   "https://data--ap-southeast.upscope.io/status?stats=1",
 ];
+const POLL_INTERVAL = 1000;
+const WS_INTERVAL = 1000;
+const WS_PORT = 8080;
 
-const INTERVAL = 1000;
-
-function callback(update: CacheElement) {
-  console.table(update);
-}
-
+const wsServer = new WebSocketsServer(WS_PORT, WS_INTERVAL);
+const callback = wsServer.start();
 const poller = new PollApi(callback);
 
 API_LIST.forEach((url) => {
-  poller.add(url, INTERVAL);
+  poller.addUrl(url, POLL_INTERVAL);
 });
