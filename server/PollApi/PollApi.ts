@@ -1,8 +1,15 @@
 export type CacheElement = {
+  url: string;
   data: Object;
   lastUpdate: Date;
   errorMessage: string;
 };
+
+function getTimeout(interval: number): Promise<never> {
+  return new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error("Request timed out")), interval)
+  );
+}
 
 export default class PollApi {
   private cache: Map<string, CacheElement> = new Map();
@@ -14,24 +21,25 @@ export default class PollApi {
   }
 
   updateCache(url: string, res: { data?: Object; errorMessage?: string }) {
+    // The response always contains a unique data
+    // so we always have to update the cache
+
     const currentData = this.cache.get(url);
     let newData = {
+      url,
+      errorMessage: "",
       data: {},
       lastUpdate: new Date(),
-      errorMessage: "",
-    };
-    newData = {
-      ...newData,
-      // Applying default values
-      ...(currentData ? currentData : {}),
       // Overwriting default values with cached if available
-      ...(res ? res : {}),
+      ...(currentData ? currentData : {}),
       // Overwriting defaults and cache with new values if available
+      ...(res ? res : {}),
     };
     this.cache.set(url, newData);
-    const currentCache = Array.from(this.cache, ([url, value]) => [
-      { url, ...value },
-    ]);
+    const currentCache: CacheElement[] = Array.from(
+      this.cache,
+      ([_url, value]) => ({ ...value })
+    );
     this.callback(currentCache);
   }
 
@@ -46,16 +54,16 @@ export default class PollApi {
     }
     const poll = async () => {
       try {
-        const res = await fetch(url);
+        // Handling race conditions
+        // by setting up a timeout for the request
+        const res = await Promise.race([fetch(url), getTimeout(interval)]);
         const data = await res.json();
-        // The response is always unique
-        // so we always update the cache
-        this.updateCache(url, { data });
+        this.updateCache(url, { errorMessage: "", data });
       } catch (e) {
-        console.error(
-          `Error fetching url: ${url}.\nError message: ${e.message}`
-        );
-        this.updateCache(url, { errorMessage: e.message });
+        // console.error(
+        //   `Error fetching url: ${url}.\nError message: ${e?.message}`
+        // );
+        this.updateCache(url, { errorMessage: e?.message });
       }
     };
     poll();
