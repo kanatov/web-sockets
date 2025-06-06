@@ -9,13 +9,19 @@ type AllServicesType = {
 interface StatusStoreInterface {
   data: CacheElement[]
   allServices: AllServicesType[]
+  lastUpdate: Date | null
+  currentService: string
   setData: (data: CacheElement[]) => void
   setAllServices: (newAllServices: AllServicesType[]) => void
+  setLastUpdate: (lastUpdate: Date) => void
+  setCurrentService: (service: string) => void
 }
 
 const useStatusStore = create<StatusStoreInterface>((set, get) => ({
   data: [],
   allServices: [],
+  lastUpdate: null,
+  currentService: '',
   setData: (data: CacheElement[]) => set({ data }),
   setAllServices: (newAllServices: AllServicesType[]) => {
     const currentAllServices = get().allServices
@@ -23,10 +29,18 @@ const useStatusStore = create<StatusStoreInterface>((set, get) => ({
       set({ allServices: newAllServices })
     }
   },
+  setLastUpdate: (lastUpdate: Date) => set({ lastUpdate }),
+  setCurrentService: (service: string) => set({ currentService: service }),
 }))
 
 export function updateStore(data: CacheElement[]) {
-  const { setData, setAllServices } = useStatusStore.getState()
+  const {
+    setData,
+    setAllServices,
+    setLastUpdate,
+    currentService,
+    setCurrentService,
+  } = useStatusStore.getState()
   setData(data)
 
   // Generating allServices from the data
@@ -36,5 +50,9 @@ export function updateStore(data: CacheElement[]) {
     status: item.data.status,
   }))
   setAllServices(allServices)
+  setLastUpdate(new Date())
+  if (currentService === '') {
+    setCurrentService(allServices[0].region)
+  }
 }
 export default useStatusStore
