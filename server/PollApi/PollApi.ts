@@ -1,77 +1,77 @@
 export type CacheElement = {
-  url: string;
-  data: Object;
-  lastUpdate: Date;
-  errorMessage: string;
-};
+  url: string
+  data: Object
+  lastUpdate: Date
+  errorMessage: string
+}
 
 function getTimeout(interval: number): Promise<never> {
   return new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error("Request timed out")), interval)
-  );
+    setTimeout(() => reject(new Error('Request timed out')), interval),
+  )
 }
 
 export default class PollApi {
-  private cache: Map<string, CacheElement> = new Map();
-  private defaultInterval: number = 5000;
-  private callback;
+  private cache: Map<string, CacheElement> = new Map()
+  private defaultInterval: number = 5000
+  private callback
 
   constructor(callback: (update: CacheElement[]) => void) {
-    this.callback = callback;
+    this.callback = callback
   }
 
   updateCache(url: string, res: { data?: Object; errorMessage?: string }) {
     // The response always contains a unique data
     // so we always have to update the cache
 
-    const currentData = this.cache.get(url);
+    const currentData = this.cache.get(url)
     let newData = {
       url,
-      errorMessage: "",
+      errorMessage: '',
       data: {},
       lastUpdate: new Date(),
       // Overwriting default values with cached if available
       ...(currentData ? currentData : {}),
       // Overwriting defaults and cache with new values if available
       ...(res ? res : {}),
-    };
-    this.cache.set(url, newData);
+    }
+    this.cache.set(url, newData)
     const currentCache: CacheElement[] = Array.from(
       this.cache,
-      ([_url, value]) => ({ ...value })
-    );
-    this.callback(currentCache);
+      ([_url, value]) => ({ ...value }),
+    )
+    this.callback(currentCache)
   }
 
   addUrl(url: string, interval: number = this.defaultInterval) {
     if (!url) {
-      console.error("No url to poll");
-      return;
+      console.error('No url to poll')
+      return
     }
     if (this.cache.has(url)) {
-      console.warn(`The url "${url}" has already cached`);
-      return;
+      console.warn(`The url "${url}" has already cached`)
+      return
     }
     const poll = async () => {
       try {
         // Handling race conditions
         // by setting up a timeout for the request
-        const res = await Promise.race([fetch(url), getTimeout(interval)]);
-        const data = await res.json();
-        this.updateCache(url, { errorMessage: "", data });
+        const res = await Promise.race([fetch(url), getTimeout(interval)])
+        const data = await res.json()
+        this.updateCache(url, { errorMessage: '', data })
       } catch (e) {
         // console.error(
         //   `Error fetching url: ${url}.\nError message: ${e?.message}`
         // );
-        this.updateCache(url, { errorMessage: e?.message });
+        this.updateCache(url, { errorMessage: e?.message })
       }
-    };
-    poll();
+    }
+    poll()
     // Each request polls independently,
     // regarding the state of others.
     // Each request has it's own update interval
     // in case of different frequency of updates.
     // TODO: delete interval and cache entry
-    setInterval(poll, interval);
+    setInterval(poll, interval)
   }
 }

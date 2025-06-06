@@ -1,9 +1,9 @@
-import { useMemo } from "react";
-import useStatusStore from "../../store/statusStore";
+import { useMemo } from 'react'
+import useStatusStore from '../../store/statusStore'
 
 export default function AllServices() {
-  const allServices = useStatusStore(({ allServices }) => allServices);
-  const allServicesMemo = useMemo(() => allServices, [allServices]);
+  const allServices = useStatusStore(({ allServices }) => allServices)
+  const allServicesMemo = useMemo(() => allServices, [allServices])
   return (
     <div>
       <h3>All Services</h3>
@@ -18,5 +18,5 @@ export default function AllServices() {
         </div>
       ))}
     </div>
-  );
+  )
 }
