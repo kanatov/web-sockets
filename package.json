@@ -1,36 +1,36 @@
 {
   "name": "web-sockets",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "version": "1.0.0",
+  "description": "**Live version: [websockets-bfcb5.web.app](https://websockets-bfcb5.web.app)**",
+  "main": "eslint.config.js",
   "scripts": {
+    "install:frontend": "cd frontend && npm install",
+    "install:server": "cd server && npm install",
+    "install": "npm run install:frontend && npm run install:server",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:server": "cd server && npm run dev",
     "dev": "concurrently -n client,server -c green,blue \"npm run dev:frontend\" \"npm run dev:server\"",
-    "dev:frontend": "vite",
-    "dev:server": "node --watch server/index.ts",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "build:frontend": "cd frontend && npm run build",
+    "build:server": "cd server && npm run build",
+    "build": "npm run build:frontend && npm run build:server",
+    "start:frontend": "cd frontend && npm run start",
+    "start:server": "cd server && npm run start",
+    "start": "concurrently -n client,server -c green,blue \"npm run start:frontend\" \"npm run start:server\"",
+    "lint": "eslint ."
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kanatov/web-sockets.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/kanatov/web-sockets/issues"
+  },
+  "homepage": "https://github.com/kanatov/web-sockets#readme",
   "dependencies": {
-    "@tailwindcss/vite": "^4.1.8",
-    "concurrently": "^9.1.2",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "tailwindcss": "^4.1.8",
-    "ws": "^8.18.2",
-    "zustand": "^5.0.5"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.25.0",
-    "@types/react": "^19.1.2",
-    "@types/react-dom": "^19.1.2",
-    "@vitejs/plugin-react-swc": "^3.9.0",
-    "eslint": "^9.25.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.19",
-    "globals": "^16.0.0",
-    "typescript": "~5.8.3",
-    "typescript-eslint": "^8.30.1",
-    "vite": "^6.3.5"
+    "concurrently": "^9.1.2"
   }
 }

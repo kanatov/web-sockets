@@ -1,54 +1,35 @@
-# React + TypeScript + Vite
+# Web Sockets based dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Project features
 
-Currently, two official plugins are available:
+- **Cached states**, only the cached state is served to web-socket clients
+- **Individual refresh rate for each API**, API polled individually and don't interfere each other
+- **Handling race condition**, old requests doesn't overright the new one
+- **Optimal re-renders**, no wasteful renders for the components that doesn't change
+- **Some visual UI**, very linmited but essential dashboard
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Spent time
 
-## Expanding the ESLint configuration
+12 hours
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### The most challenging moment
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+Unfortunately there was very short notice given to find time for the bonus part. Hovewere the most challening appears to host the backend as a Firebase App and not as a function. I will update the description with the link as soon as I'll make it work.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+**Video demonstarion**
+[![Web Sockets](https://github.com/user-attachments/assets/ea1b5777-0632-4f3d-8650-02653c9dec4f)](https://youtu.be/R5Vl5zXtzrc 'Web Sockets')
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## How to Run the Project
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+1. Clone the repo: `https://github.com/kanatov/web-sockets.git`
+2. `cd web-sockets`
+3. Run `npm i` to install dependencies
+4. Use `npm run` to list all available commands
+
+| Command         | Description                                        |
+| --------------- | -------------------------------------------------- |
+| `npm run build` | Builds the production version of client and server |
+| `npm start`     | Runs the project build in production mode          |
+| `npm run dev`   | Runs dev mode                                      |
+
+## Thank you!

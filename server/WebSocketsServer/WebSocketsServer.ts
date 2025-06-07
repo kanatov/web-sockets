@@ -1,5 +1,5 @@
 import WebSocket, { WebSocketServer } from 'ws'
-import { type CacheElement } from '../PollApi/PollApi.ts'
+import { type CacheElement } from '../PollApi/PollApi.js'
 
 // Making the class data agnostic
 export default class WebSocketsServer {
@@ -23,11 +23,17 @@ export default class WebSocketsServer {
     })
 
     this.wss.on('connection', () => {
+      if (!this.wss) {
+        throw new Error('WebSocketServer is not initialized')
+      }
       console.log('Clients: ', this.wss.clients.size)
     })
 
     // TODO: remove interval and destroy the server
     setInterval(() => {
+      if (!this.wss) {
+        throw new Error('WebSocketServer is not initialized')
+      }
       if (this.wss.clients.size > 0) {
         this.broadcast()
       }
@@ -41,6 +47,9 @@ export default class WebSocketsServer {
   }
 
   broadcast() {
+    if (!this.wss) {
+      throw new Error('WebSocketServer is not initialized')
+    }
     this.wss.clients.forEach((client: WebSocket) => {
       client.send(JSON.stringify(this.data))
     })

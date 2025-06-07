@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { type CacheElement } from '../../server/PollApi/PollApi.ts'
+import { type CacheElement } from '../../../server/PollApi/PollApi.js'
 
 type AllServicesType = {
   region: string

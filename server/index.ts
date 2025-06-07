@@ -1,5 +1,5 @@
-import PollApi from './PollApi/PollApi.ts'
-import WebSocketsServer from './WebSocketsServer/WebSocketsServer.ts'
+import PollApi from './PollApi/PollApi.js'
+import WebSocketsServer from './WebSocketsServer/WebSocketsServer.js'
 
 const API_LIST = [
   'https://data--us-east.upscope.io/status?stats=1',
@@ -11,12 +11,14 @@ const API_LIST = [
 ]
 const POLL_INTERVAL = 1000
 const WS_INTERVAL = 1000
-const WS_PORT = 8080
+const WS_PORT = parseInt(process.env.PORT || '8080')
 
 const wsServer = new WebSocketsServer(WS_PORT, WS_INTERVAL)
 const callback = wsServer.start()
 const poller = new PollApi(callback)
 
-API_LIST.forEach((url) => {
+API_LIST.forEach((url: string) => {
   poller.addUrl(url, POLL_INTERVAL)
 })
+
+console.log(`Server attempting to start on port ${WS_PORT}`)

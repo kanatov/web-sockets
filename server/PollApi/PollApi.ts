@@ -1,13 +1,23 @@
+export type APIData = {
+  status: string
+  region: string
+  version: string
+  results: {
+    services: Record<string, boolean>
+    stats?: unknown
+  }
+}
+
 export type CacheElement = {
   url: string
-  data: Object
+  data: APIData
   lastUpdate: Date
   errorMessage: string
 }
 
 function getTimeout(interval: number): Promise<never> {
   return new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error('Request timed out')), interval),
+    setTimeout(() => reject(new Error('Request timed out')), interval)
   )
 }
 
@@ -35,10 +45,10 @@ export default class PollApi {
       // Overwriting defaults and cache with new values if available
       ...(res ? res : {}),
     }
-    this.cache.set(url, newData)
+    this.cache.set(url, newData as CacheElement)
     const currentCache: CacheElement[] = Array.from(
       this.cache,
-      ([_url, value]) => ({ ...value }),
+      ([_url, value]) => ({ ...value })
     )
     this.callback(currentCache)
   }
@@ -59,11 +69,9 @@ export default class PollApi {
         const res = await Promise.race([fetch(url), getTimeout(interval)])
         const data = await res.json()
         this.updateCache(url, { errorMessage: '', data })
-      } catch (e) {
-        // console.error(
-        //   `Error fetching url: ${url}.\nError message: ${e?.message}`
-        // );
-        this.updateCache(url, { errorMessage: e?.message })
+      } catch (e: unknown) {
+        const errorMessage = e instanceof Error ? e.message : String(e)
+        this.updateCache(url, { errorMessage })
       }
     }
     poll()
